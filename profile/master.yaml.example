@@ -9,8 +9,8 @@ personal:
   phone: "<your phone>"
   location: "<city, country>"
   links:
-    linkedin: "<https://www.linkedin.com/in/...>"
-    github: "<https://github.com/...>"
+    linkedin: "https://www.linkedin.com/in/..."
+    github: "https://github.com/..."
     portfolio: ""
 
 summary: |
