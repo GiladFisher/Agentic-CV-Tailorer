@@ -1,0 +1,69 @@
+# Master profile — single source of truth for CV generation.
+# Copy this file to master.yaml and fill in your details.
+# Keep dates in YYYY-MM format. Use "present" for current roles.
+
+personal:
+  name: "<your full name>"
+  headline: ""           # e.g. "Machine Learning Engineer" — or leave blank for per-job tailoring
+  email: "<your email>"
+  phone: "<your phone>"
+  location: "<city, country>"
+  links:
+    linkedin: "<https://www.linkedin.com/in/...>"
+    github: "<https://github.com/...>"
+    portfolio: ""
+
+summary: |
+  # Optional. Leave blank — the tailorer writes a per-job summary from the facts below.
+
+experience:
+  - title: "<job title>"
+    company: "<company name>"
+    location: "<city, country>"
+    start: "YYYY-MM"
+    end: "YYYY-MM"       # or "present"
+    tech:
+      - "<technology>"
+    bullets:
+      - "<accomplishment — quantify where possible (e.g. reduced latency by 40%)>"
+    achievements: []     # standout wins worth highlighting separately
+
+education:
+  - institution: "<university name>"
+    degree: "<B.Sc. / M.Sc. / etc.>"
+    field: "<field of study>"
+    start: "YYYY"
+    end: "YYYY"
+    gpa: ""
+    honors: []
+    notes: []
+
+skills:
+  languages: []          # programming languages
+  frameworks: []
+  tools: []
+  domains: []            # e.g. NLP, computer vision, distributed systems
+  soft: []
+
+projects:
+  - name: "<project name>"
+    description: "<what it does and why it matters>"
+    tech: []
+    link: ""
+    bullets: []
+    start: ""
+    end: ""
+
+certifications: []       # {name, issuer, date, link}
+
+publications: []         # {title, venue, year, link, authors}
+
+awards: []               # {name, issuer, date, description}
+
+languages_spoken:
+  - language: "<language>"
+    proficiency: "native / fluent / professional / conversational"
+
+notes: |
+  # Free-form context the tailorer can draw on but won't print verbatim.
+  # Use this for: job family targets, gaps to explain, tone preferences, etc.

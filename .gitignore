@@ -1,0 +1,27 @@
+# Personal data / PII — local only, never commit
+profile/master.yaml
+profile/supporting/
+
+# Per-job application activity — local only
+jobs/
+
+# State tracking
+state/seen_jobs.json
+state/applied.json
+
+# Generated CV outputs
+**/*.docx
+**/*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
