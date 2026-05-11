@@ -28,11 +28,14 @@ def _parse_inline(paragraph, text, base_size=10, base_color=None):
     """Append inline-formatted runs to paragraph, handling **bold**, *italic*, [link](url)."""
     i = 0
     while i < len(text):
-        # [display](url) — render display text only, no hyperlink
-        m = re.match(r"\[([^\]]+)\]\([^)]+\)", text[i:])
+        # [display](url) — render bare URL as plain text (strip https:// and trailing slash)
+        m = re.match(r"\[([^\]]+)\]\(([^)]+)\)", text[i:])
         if m:
-            run = paragraph.add_run(m.group(1))
+            bare = re.sub(r"^https?://(www\.)?", "", m.group(2)).rstrip("/")
+            run = paragraph.add_run(bare)
             run.font.size = Pt(base_size)
+            if base_color:
+                run.font.color.rgb = base_color
             i += len(m.group(0))
             continue
         # Bold
