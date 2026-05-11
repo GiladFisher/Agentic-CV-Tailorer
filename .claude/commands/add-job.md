@@ -1,40 +1,23 @@
 ---
-description: Ingest a new job listing. Prompts you to paste the job description, then saves it to disk.
-argument-hint: <url>
-allowed-tools: Read, Write, Glob
+description: Fetch a LinkedIn job listing by URL and save it to disk. Usage: /add-job <url>
+argument-hint: <linkedin-job-url>
+allowed-tools: Bash, Read
 ---
 
-Ingest a new job listing into the Agentic CV Tailorer project.
-
-The job URL (if provided) is: `$ARGUMENTS`
+Fetch and ingest the LinkedIn job at: `$ARGUMENTS`
 
 ## What to do
 
-1. Ask the user to paste the full job description text. Wait for their reply before continuing.
+1. Run:
+   ```
+   python src/fetch_job.py $ARGUMENTS
+   ```
 
-2. Extract from the pasted text:
-   - `title` — exact job title as written
-   - `company` — company name
-   - `location` — location or "Remote"
+2. Parse the output to get the `job-id` (printed as `job-id: <value>` on the last line).
 
-3. Generate a job ID: `<company-slug>-<title-slug>-<YYYYMM>` using today's date.
-   Lowercase, hyphens only. Example: `google-software-engineer-202605`.
+3. Handle errors:
+   - `ModuleNotFoundError` for `requests` or `bs4` → tell user: `pip install requests beautifulsoup4`
+   - Rate-limited → tell user to wait 1–2 minutes and retry
+   - HTTP error or empty description → tell user LinkedIn may have blocked the request; they can retry or paste the description manually
 
-4. Check for duplicates: Glob `jobs/<id>/`. If it already exists, warn the user and ask whether to continue or abort.
-
-5. Create `jobs/<id>/job.json`:
-```json
-{
-  "id": "<id>",
-  "title": "<job title>",
-  "company": "<company>",
-  "location": "<location>",
-  "url": "<url from arguments or empty string>",
-  "date_added": "<YYYY-MM-DD>",
-  "description": "<full pasted description>"
-}
-```
-
-6. Read `state/seen_jobs.json`, add `"<id>": {"date_added": "<YYYY-MM-DD>", "status": "ingested"}`, write it back.
-
-7. Tell the user the job was saved and to run `/do <id>` for the full pipeline, or `/analyze <id>` to start step by step.
+4. On success, tell the user the job was saved and to run `/do <job-id>` to generate the tailored CV, or `/analyze <job-id>` to start step by step.
