@@ -1,23 +1,75 @@
 ---
-description: Fetch a LinkedIn job listing by URL and save it to disk. Usage: /add-job <url>
+description: Fetch a LinkedIn job by URL and produce a tailored CV in one shot.
 argument-hint: <linkedin-job-url>
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, Write, Glob
 ---
 
-Fetch and ingest the LinkedIn job at: `$ARGUMENTS`
+Full pipeline: fetch the job at `$ARGUMENTS`, analyze it, tailor a CV, and render to .docx.
 
-## What to do
+## NON-NEGOTIABLE RULE
+**Never invent facts.** Every skill, bullet, date, and credential in the CV must come from `profile/master.yaml`. Reword and emphasise — never fabricate.
 
-1. Run:
-   ```
-   python src/fetch_job.py $ARGUMENTS
-   ```
+## Stage 1 — Fetch
 
-2. Parse the output to get the `job-id` (printed as `job-id: <value>` on the last line).
+Run:
+```
+python src/fetch_job.py $ARGUMENTS
+```
 
-3. Handle errors:
-   - `ModuleNotFoundError` for `requests` or `bs4` → tell user: `pip install requests beautifulsoup4`
-   - Rate-limited → tell user to wait 1–2 minutes and retry
-   - HTTP error or empty description → tell user LinkedIn may have blocked the request; they can retry or paste the description manually
+Parse the output for the `job-id` line (`job-id: <value>`). Stop and report the error if the script fails.
 
-4. On success, tell the user the job was saved and to run `/do <job-id>` to generate the tailored CV, or `/analyze <job-id>` to start step by step.
+## Stage 2 — Analyze
+
+Read `jobs/<job-id>/job.json`. Analyze the `description` field and write `jobs/<job-id>/analysis.json` with:
+- `required_skills`, `preferred_skills`, `responsibilities` (4–6 items)
+- `seniority`, `domain`, `keywords`, `must_haves`, `culture_signals`
+
+## Stage 3 — Tailor
+
+Read `profile/master.yaml` and `jobs/<job-id>/analysis.json`.
+
+Match profile facts to job requirements. Write `jobs/<job-id>/cv.md` using this format:
+
+```
+# <Full Name>
+<email> | <phone> | <location> | [LinkedIn](<url>) | [GitHub](<url>)
+
+## Summary
+<2–3 sentences tailored to this job. Facts from profile only.>
+
+## Experience
+
+### <Title> — <Company>
+*<Mon YYYY> – <Mon YYYY or Present> | <Location>*
+- <bullet>
+
+## Skills
+**<Category>:** <list>
+
+## Education
+
+### <Degree> — <Institution>
+*<YYYY> – <YYYY> | GPA: <gpa>, <honors>*
+
+## Projects
+
+### <Project Name>
+*<date>*
+- <bullet>
+
+## Languages
+<Language> (<proficiency>), ...
+```
+
+Omit sections that add no value for this job.
+
+## Stage 4 — Render
+
+Run:
+```
+python src/render_docx.py <job-id>
+```
+
+## Done
+
+Tell the user where to find the output: `jobs/<job-id>/cv.docx` and `jobs/<job-id>/cv.md`.
