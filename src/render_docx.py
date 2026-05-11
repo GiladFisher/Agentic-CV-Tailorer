@@ -14,36 +14,25 @@ SECTION_COLOR = RGBColor(0x1F, 0x49, 0x7D)
 META_COLOR = RGBColor(0x60, 0x60, 0x60)
 
 
-def _add_hyperlink(paragraph, text, url):
-    part = paragraph.part
-    r_id = part.relate_to(
-        url,
-        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
-        is_external=True,
-    )
-    hyperlink = OxmlElement("w:hyperlink")
-    hyperlink.set(qn("r:id"), r_id)
-    r = OxmlElement("w:r")
-    rPr = OxmlElement("w:rPr")
-    rStyle = OxmlElement("w:rStyle")
-    rStyle.set(qn("w:val"), "Hyperlink")
-    rPr.append(rStyle)
-    r.append(rPr)
-    t = OxmlElement("w:t")
-    t.text = text
-    r.append(t)
-    hyperlink.append(r)
-    paragraph._p.append(hyperlink)
+def _set_line_spacing(paragraph, spacing=0.9):
+    pPr = paragraph._p.get_or_add_pPr()
+    for existing in pPr.findall(qn("w:spacing")):
+        pPr.remove(existing)
+    sp = OxmlElement("w:spacing")
+    sp.set(qn("w:line"), str(int(spacing * 240)))
+    sp.set(qn("w:lineRule"), "auto")
+    pPr.append(sp)
 
 
 def _parse_inline(paragraph, text, base_size=10, base_color=None):
     """Append inline-formatted runs to paragraph, handling **bold**, *italic*, [link](url)."""
     i = 0
     while i < len(text):
-        # Hyperlink
-        m = re.match(r"\[([^\]]+)\]\(([^)]+)\)", text[i:])
+        # [display](url) — render display text only, no hyperlink
+        m = re.match(r"\[([^\]]+)\]\([^)]+\)", text[i:])
         if m:
-            _add_hyperlink(paragraph, m.group(1), m.group(2))
+            run = paragraph.add_run(m.group(1))
+            run.font.size = Pt(base_size)
             i += len(m.group(0))
             continue
         # Bold
@@ -75,6 +64,7 @@ def _parse_inline(paragraph, text, base_size=10, base_color=None):
 
 def _add_section_header(doc, text):
     p = doc.add_paragraph()
+    _set_line_spacing(p)
     p.paragraph_format.space_before = Pt(10)
     p.paragraph_format.space_after = Pt(2)
     run = p.add_run(text.upper())
@@ -128,6 +118,7 @@ def render(job_id: str):
         # Name — first # heading
         if s.startswith("# ") and not s.startswith("## ") and not header_done:
             p = doc.add_paragraph()
+            _set_line_spacing(p)
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p.paragraph_format.space_after = Pt(1)
             run = p.add_run(s[2:].strip())
@@ -138,6 +129,7 @@ def render(job_id: str):
             # Contact line immediately follows
             if i < len(lines) and lines[i].strip() and not lines[i].startswith("#"):
                 p = doc.add_paragraph()
+                _set_line_spacing(p)
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p.paragraph_format.space_after = Pt(6)
                 _parse_inline(p, lines[i].strip(), base_size=9)
@@ -153,6 +145,7 @@ def render(job_id: str):
         # Subsection header ###
         if s.startswith("### "):
             p = doc.add_paragraph()
+            _set_line_spacing(p)
             p.paragraph_format.space_before = Pt(5)
             p.paragraph_format.space_after = Pt(0)
             run = p.add_run(s[4:].strip())
@@ -164,6 +157,7 @@ def render(job_id: str):
         # Italic meta line *text* (dates, locations)
         if s.startswith("*") and s.endswith("*") and not s.startswith("**"):
             p = doc.add_paragraph()
+            _set_line_spacing(p)
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(2)
             run = p.add_run(s[1:-1])
@@ -176,6 +170,7 @@ def render(job_id: str):
         # Bullet
         if s.startswith("- "):
             p = doc.add_paragraph(style="List Bullet")
+            _set_line_spacing(p)
             p.paragraph_format.space_after = Pt(1)
             _parse_inline(p, s[2:].strip())
             i += 1
@@ -183,6 +178,7 @@ def render(job_id: str):
 
         # Normal paragraph (skills lines with **Label:** value)
         p = doc.add_paragraph()
+        _set_line_spacing(p)
         p.paragraph_format.space_after = Pt(2)
         _parse_inline(p, s)
         i += 1
