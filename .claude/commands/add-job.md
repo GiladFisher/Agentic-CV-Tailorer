@@ -35,7 +35,7 @@ Match profile facts to job requirements. Write `jobs/<job-id>/cv.md` using this 
 <email> | <phone> | <location> | [LinkedIn](<url>) | [GitHub](<url>)
 
 ## Summary
-<2–3 sentences tailored to this job. Facts from profile only.>
+<2 tight sentences max. Lead with your strongest relevant fact, end with your value to this specific role. No filler.>
 
 ## Experience
 

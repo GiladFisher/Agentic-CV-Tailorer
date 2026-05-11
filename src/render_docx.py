@@ -14,6 +14,28 @@ SECTION_COLOR = RGBColor(0x1F, 0x49, 0x7D)
 META_COLOR = RGBColor(0x60, 0x60, 0x60)
 
 
+def _add_hyperlink(paragraph, display, url):
+    part = paragraph.part
+    r_id = part.relate_to(
+        url,
+        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
+        is_external=True,
+    )
+    hyperlink = OxmlElement("w:hyperlink")
+    hyperlink.set(qn("r:id"), r_id)
+    r = OxmlElement("w:r")
+    rPr = OxmlElement("w:rPr")
+    rStyle = OxmlElement("w:rStyle")
+    rStyle.set(qn("w:val"), "Hyperlink")
+    rPr.append(rStyle)
+    r.append(rPr)
+    t = OxmlElement("w:t")
+    t.text = display
+    r.append(t)
+    hyperlink.append(r)
+    paragraph._p.append(hyperlink)
+
+
 def _set_line_spacing(paragraph, spacing=0.9):
     pPr = paragraph._p.get_or_add_pPr()
     for existing in pPr.findall(qn("w:spacing")):
@@ -28,14 +50,11 @@ def _parse_inline(paragraph, text, base_size=10, base_color=None):
     """Append inline-formatted runs to paragraph, handling **bold**, *italic*, [link](url)."""
     i = 0
     while i < len(text):
-        # [display](url) — render bare URL as plain text (strip https:// and trailing slash)
+        # [display](url) — clickable hyperlink showing bare URL as visible text
         m = re.match(r"\[([^\]]+)\]\(([^)]+)\)", text[i:])
         if m:
             bare = re.sub(r"^https?://(www\.)?", "", m.group(2)).rstrip("/")
-            run = paragraph.add_run(bare)
-            run.font.size = Pt(base_size)
-            if base_color:
-                run.font.color.rgb = base_color
+            _add_hyperlink(paragraph, bare, m.group(2))
             i += len(m.group(0))
             continue
         # Bold
