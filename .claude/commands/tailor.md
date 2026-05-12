@@ -31,7 +31,7 @@ If the job requires something the profile lacks, omit it silently. Do not fabric
 <email> | <phone> | <location> | [LinkedIn](<url>) | [GitHub](<url>)
 
 ## Summary
-<2 tight sentences max. Lead with your strongest relevant fact, end with your value to this specific role. No filler.>
+<1 sentence that is NOT already stated in the bullets below. State the candidate's direction and unique angle for this specific role. If you cannot write something genuinely additive, omit this section entirely.>
 
 ## Experience
 
