@@ -50,7 +50,7 @@ If the job requires something the profile lacks, omit it silently. Do not fabric
 
 ## Projects
 
-### <Project Name>
+### [<Project Name>](<github or project url>)
 *<date or range>*
 - <bullet>
 

@@ -49,7 +49,7 @@ Reword and emphasise — never fabricate.
 
 ## Projects
 
-### <Project Name>
+### [<Project Name>](<github or project url>)
 *<date>*
 - <bullet>
 

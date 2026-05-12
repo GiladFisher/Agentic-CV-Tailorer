@@ -53,7 +53,7 @@ Match profile facts to job requirements. Write `jobs/<job-id>/cv.md` using this 
 
 ## Projects
 
-### <Project Name>
+### [<Project Name>](<github or project url>)
 *<date>*
 - <bullet>
 

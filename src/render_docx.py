@@ -14,7 +14,7 @@ SECTION_COLOR = RGBColor(0x1F, 0x49, 0x7D)
 META_COLOR = RGBColor(0x60, 0x60, 0x60)
 
 
-def _add_hyperlink(paragraph, display, url):
+def _add_hyperlink(paragraph, display, url, size=10, bold=False):
     part = paragraph.part
     r_id = part.relate_to(
         url,
@@ -25,9 +25,18 @@ def _add_hyperlink(paragraph, display, url):
     hyperlink.set(qn("r:id"), r_id)
     r = OxmlElement("w:r")
     rPr = OxmlElement("w:rPr")
-    rStyle = OxmlElement("w:rStyle")
-    rStyle.set(qn("w:val"), "Hyperlink")
-    rPr.append(rStyle)
+    # Explicit blue + underline so it works regardless of Word's Hyperlink style
+    color_el = OxmlElement("w:color")
+    color_el.set(qn("w:val"), "0563C1")
+    rPr.append(color_el)
+    u_el = OxmlElement("w:u")
+    u_el.set(qn("w:val"), "single")
+    rPr.append(u_el)
+    sz_el = OxmlElement("w:sz")
+    sz_el.set(qn("w:val"), str(int(size * 2)))
+    rPr.append(sz_el)
+    if bold:
+        rPr.append(OxmlElement("w:b"))
     r.append(rPr)
     t = OxmlElement("w:t")
     t.text = display
@@ -54,7 +63,7 @@ def _parse_inline(paragraph, text, base_size=10, base_color=None):
         m = re.match(r"\[([^\]]+)\]\(([^)]+)\)", text[i:])
         if m:
             bare = re.sub(r"^https?://(www\.)?", "", m.group(2)).rstrip("/")
-            _add_hyperlink(paragraph, bare, m.group(2))
+            _add_hyperlink(paragraph, bare, m.group(2), size=base_size)
             i += len(m.group(0))
             continue
         # Bold
@@ -164,15 +173,25 @@ def render(job_id: str):
             i += 1
             continue
 
-        # Subsection header ###
+        # Subsection header ###  (supports ### [Name](url) for linked project headings)
         if s.startswith("### "):
             p = doc.add_paragraph()
             _set_line_spacing(p)
             p.paragraph_format.space_before = Pt(5)
             p.paragraph_format.space_after = Pt(0)
-            run = p.add_run(s[4:].strip())
-            run.bold = True
-            run.font.size = Pt(10)
+            heading_text = s[4:].strip()
+            m_link = re.match(r"^\[([^\]]+)\]\(([^)]+)\)(.*)", heading_text)
+            if m_link:
+                _add_hyperlink(p, m_link.group(1), m_link.group(2), size=10, bold=True)
+                rest = m_link.group(3).strip()
+                if rest:
+                    run = p.add_run(" " + rest)
+                    run.bold = True
+                    run.font.size = Pt(10)
+            else:
+                run = p.add_run(heading_text)
+                run.bold = True
+                run.font.size = Pt(10)
             i += 1
             continue
 
