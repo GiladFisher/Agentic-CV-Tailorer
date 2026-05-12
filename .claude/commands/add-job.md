@@ -35,7 +35,7 @@ Match profile facts to job requirements. Write `jobs/<job-id>/cv.md` using this 
 <email> | <phone> | <location> | [LinkedIn](<url>) | [GitHub](<url>)
 
 ## Summary
-<1 sentence that is NOT already stated in the bullets below. State the candidate's direction and unique angle for this specific role. If you cannot write something genuinely additive, omit this section entirely.>
+<Check profile/master.yaml for a summaries entry whose key matches the job domain (security / sysadmin / data_science / fullstack). If one exists, adapt it to this specific role and company in one sentence. If none matches or the result would only repeat what's in the bullets, omit this section entirely.>
 
 ## Experience
 
