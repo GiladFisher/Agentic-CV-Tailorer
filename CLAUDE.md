@@ -35,6 +35,15 @@ src/                         # Python utilities (docx rendering etc.)
 | `/do <id>` | Full pipeline: analyze + tailor + render |
 | `/list-jobs` | Show all jobs and their current state |
 
+## Git & environment notes
+
+- **Shell:** PowerShell. Use PowerShell syntax — `$env:VAR`, backtick for line continuation, no `&&` operator (use `;` or `if ($?) { ... }` instead).
+- **Path has spaces:** always quote — `"C:\Users\Brother printer\Documents\Projects\Agentic CV Tailorer"`.
+- **gh CLI:** not always in PATH. Use the full path: `& "C:\Program Files\GitHub CLI\gh.exe"`.
+- **git push:** uses HTTPS. The `credential-manager-core` warning on push is harmless — the push succeeds regardless.
+- **Remote:** `https://github.com/GiladFisher/Agentic-CV-Tailorer.git`, branch `master`.
+- **profile/master.yaml and jobs/ are gitignored** — never try to stage them.
+
 ## Job ID format
 
 `<linkedin-job-id>` when scraped, or a short slug (e.g. `google-swe-2026-05`) for manually added jobs.
